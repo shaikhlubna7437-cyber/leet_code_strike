@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CartPilot AI — Agentic Commerce Copilot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0B0F1A;
+    --panel:#131A2E;
+    --panel-2:#1B2340;
+    --paper:#F4F0E4;
+    --paper-line:#D8D2BF;
+    --violet:#7C6FFF;
+    --violet-dim:#4B4394;
+    --mint:#2FE6A6;
+    --amber:#FFB020;
+    --red:#FF6B6B;
+    --text:#E7E9F5;
+    --text-muted:#8A93B2;
+    --ink-on-paper:#20201B;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 15% -10%, rgba(124,111,255,0.16), transparent 60%),
+      radial-gradient(900px 500px at 100% 0%, rgba(47,230,166,0.08), transparent 55%),
+      var(--ink);
+    color:var(--text);
+    font-family:'IBM Plex Sans', sans-serif;
+    min-height:100vh;
+    padding:28px 20px 60px;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001s !important; transition-duration:0.001s !important;}
+  }
+
+  .wrap{max-width:1180px;margin:0 auto;}
+
+  /* ---- Header ---- */
+  header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px;}
+  .brand{display:flex;align-items:center;gap:12px;}
+  .brand .mark{
+    width:40px;height:40px;border-radius:10px;
+    background:linear-gradient(135deg,var(--violet),#4B4394);
+    display:flex;align-items:center;justify-content:center;font-size:19px;
+    box-shadow:0 0 0 1px rgba(124,111,255,0.4), 0 8px 20px -6px rgba(124,111,255,0.6);
+  }
+  .brand h1{font-family:'Space Grotesk',sans-serif;font-size:20px;margin:0;letter-spacing:0.3px;}
+  .brand p{margin:0;font-size:12px;color:var(--text-muted);font-family:'IBM Plex Mono',monospace;}
+  .track-pill{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--mint);
+    border:1px solid rgba(47,230,166,0.35);background:rgba(47,230,166,0.08);
+    padding:6px 12px;border-radius:100px;white-space:nowrap;
+  }
+
+  /* ---- Autonomy dial + stats ---- */
+  .control-row{display:flex;gap:14px;flex-wrap:wrap;align-items:stretch;margin-bottom:18px;}
+  .autonomy-card, .stat-card{
+    background:var(--panel);border:1px solid rgba(255,255,255,0.06);
+    border-radius:14px;padding:14px 16px;
+  }
+  .autonomy-card{display:flex;align-items:center;gap:14px;flex:1 1 320px;}
+  .autonomy-card .label-block{flex:1;}
+  .autonomy-card .label-block .k{font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);font-family:'IBM Plex Mono',monospace;}
+  .autonomy-card .label-block .v{font-family:'Space Grotesk',sans-serif;font-size:15px;margin-top:2px;}
+  .switch{
+    position:relative;width:64px;height:32px;border-radius:100px;
+    background:var(--panel-2);border:1px solid rgba(255,255,255,0.1);
+    cursor:pointer;flex-shrink:0;
+  }
+  .switch .knob{
+    position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;
+    background:var(--violet);transition:left 0.22s ease, background 0.22s ease;
+    box-shadow:0 2px 6px rgba(0,0,0,0.4);
+  }
+  .switch.on .knob{left:33px;background:var(--mint);}
+  .stats-row{display:flex;gap:14px;flex-wrap:wrap;flex:2 1 420px;}
+  .stat-card{flex:1 1 120px;text-align:left;}
+  .stat-card .k{font-size:10.5px;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-muted);font-family:'IBM Plex Mono',monospace;}
+  .stat-card .v{font-family:'Space Grotesk',sans-serif;font-size:22px;margin-top:4px;}
+  .stat-card .v.mint{color:var(--mint);}
+  .stat-card .v.amber{color:var(--amber);}
+
+  /* ---- Input row ---- */
+  .mission-card{
+    background:var(--panel);border:1px solid rgba(255,255,255,0.06);border-radius:16px;
+    padding:16px 18px;margin-bottom:20px;
+  }
+  .mission-card .k{font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);font-family:'IBM Plex Mono',monospace;margin-bottom:10px;}
+  .input-row{display:flex;gap:10px;}
+  .input-row input{
+    flex:1;background:var(--panel-2);border:1px solid rgba(255,255,255,0.1);
+    border-radius:10px;padding:13px 14px;color:var(--text);font-size:14.5px;
+    font-family:'IBM Plex Sans',sans-serif;
+  }
+  .input-row input:focus{outline:2px solid var(--violet);outline-offset:1px;}
+  .input-row button{
+    background:var(--violet);color:white;border:none;border-radius:10px;
+    padding:0 20px;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px;
+    cursor:pointer;transition:filter 0.15s;
+  }
+  .input-row button:hover{filter:brightness(1.12);}
+  .input-row button:disabled{opacity:0.45;cursor:not-allowed;}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+  .chip{
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--text-muted);
+    background:var(--panel-2);border:1px solid rgba(255,255,255,0.08);
+    padding:6px 11px;border-radius:100px;cursor:pointer;
+  }
+  .chip:hover{color:var(--text);border-color:var(--violet);}
+
+  /* ---- Main split ---- */
+  .split{display:grid;grid-template-columns:1.15fr 0.85fr;gap:18px;align-items:start;}
+  @media (max-width:880px){.split{grid-template-columns:1fr;}}
+
+  /* Console */
+  .console{
+    background:#0D1122;border:1px solid rgba(255,255,255,0.07);border-radius:16px;
+    padding:16px 16px 18px;min-height:420px;max-height:560px;overflow-y:auto;
+    font-family:'IBM Plex Mono',monospace;font-size:12.8px;line-height:1.7;
+  }
+  .console-head{display:flex;align-items:center;gap:8px;margin-bottom:12px;color:var(--text-muted);font-size:11px;text-transform:uppercase;letter-spacing:0.08em;}
+  .dot{width:8px;height:8px;border-radius:50%;}
+  .dot.red{background:#FF6B6B;} .dot.amber{background:var(--amber);} .dot.green{background:var(--mint);}
+  .log-line{display:flex;gap:8px;padding:3px 0;opacity:0;animation:fadeIn 0.3s forwards;}
+  @keyframes fadeIn{to{opacity:1;}}
+  .log-time{color:#4C5680;flex-shrink:0;}
+  .log-msg{white-space:pre-wrap;word-break:break-word;}
+  .log-line.info .log-msg{color:var(--text);}
+  .log-line.action .log-msg{color:#9CB4FF;}
+  .log-line.reason .log-msg{color:var(--text-muted);}
+  .log-line.deal .log-msg{color:var(--mint);}
+  .log-line.warn .log-msg{color:var(--amber);}
+  .log-line.error .log-msg{color:var(--red);}
+  .approval-box{
+    margin:10px 0 6px;padding:10px 12px;border:1px dashed var(--amber);border-radius:10px;
+    background:rgba(255,176,32,0.06);
+  }
+  .approval-box .q{color:var(--amber);margin-bottom:8px;font-size:12.5px;}
+  .approval-box .btns{display:flex;gap:8px;}
+  .approval-box button{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;border-radius:8px;padding:7px 14px;
+    cursor:pointer;border:1px solid transparent;
+  }
+  .approval-box .approve{background:var(--mint);color:#062018;font-weight:600;}
+  .approval-box .decline{background:transparent;border-color:rgba(255,255,255,0.2);color:var(--text-muted);}
+  .cursor{display:inline-block;width:7px;height:14px;background:var(--violet);animation:blink 1s step-start infinite;vertical-align:middle;margin-left:2px;}
+  @keyframes blink{50%{opacity:0;}}
+
+  /* Receipt */
+  .receipt-shell{position:sticky;top:20px;}
+  .receipt{
+    background:var(--paper);color:var(--ink-on-paper);border-radius:4px;
+    padding:22px 20px 26px;font-family:'IBM Plex Mono',monospace;
+    box-shadow:0 20px 40px -18px rgba(0,0,0,0.55);
+    background-image: repeating-linear-gradient(90deg, transparent, transparent 9px, rgba(0,0,0,0.035) 9px, rgba(0,0,0,0.035) 10px);
+    position:relative;
+  }
+  .receipt::after{
+    content:"";position:absolute;left:0;right:0;bottom:-9px;height:16px;
+    background:
+      linear-gradient(-45deg, var(--paper) 8px, transparent 8px) 0 0,
+      linear-gradient(45deg, var(--paper) 8px, transparent 8px) 0 0;
+    background-size:16px 16px; background-repeat:repeat-x;
+  }
+  .receipt h2{font-family:'Space Grotesk',sans-serif;font-size:16px;text-align:center;margin:0 0 2px;letter-spacing:0.5px;}
+  .receipt .sub{text-align:center;font-size:10.5px;color:#6b6a5f;margin-bottom:14px;}
+  .receipt .divider{border:none;border-top:1px dashed var(--paper-line);margin:12px 0;}
+  .receipt .empty{text-align:center;color:#8b8a7c;font-size:12px;padding:18px 0;}
+  .r-item{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;padding:5px 0;opacity:0;animation:printIn 0.35s forwards;}
+  @keyframes printIn{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:translateY(0);}}
+  .r-item .nm{flex:1;}
+  .r-item .nm .tag{display:block;font-size:9.5px;color:#8b8a7c;}
+  .r-item .strike{text-decoration:line-through;color:#a7a495;margin-right:6px;}
+  .r-totals{font-size:12.5px;}
+  .r-totals .row{display:flex;justify-content:space-between;padding:3px 0;}
+  .r-totals .row.total{font-weight:600;font-size:14.5px;border-top:1px dashed var(--paper-line);margin-top:6px;padding-top:8px;}
+  .r-totals .row.save{color:#1e8a63;}
+  .stamp{
+    margin:16px auto 4px;width:fit-content;border:2.5px solid var(--red);color:var(--red);
+    font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px;letter-spacing:1.5px;
+    padding:5px 14px;border-radius:6px;transform:rotate(-4deg);opacity:0;
+    animation:stampIn 0.4s 0.15s forwards;text-transform:uppercase;
+  }
+  .stamp.mint{border-color:#1e8a63;color:#1e8a63;}
+  @keyframes stampIn{from{opacity:0;transform:rotate(-4deg) scale(1.6);}to{opacity:1;transform:rotate(-4deg) scale(1);}}
+  .checkout-btn{
+    width:100%;margin-top:14px;background:var(--ink);color:var(--paper);border:none;
+    border-radius:8px;padding:12px;font-family:'Space Grotesk',sans-serif;font-weight:600;
+    font-size:13.5px;cursor:pointer;letter-spacing:0.3px;
+  }
+  .checkout-btn:disabled{opacity:0.35;cursor:not-allowed;}
+  .reset-btn{
+    width:100%;margin-top:8px;background:transparent;color:#6b6a5f;border:1px solid var(--paper-line);
+    border-radius:8px;padding:9px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;cursor:pointer;
+  }
+  .order-id{text-align:center;font-size:10.5px;color:#8b8a7c;margin-top:8px;}
+
+  .guardrail-note{
+    margin-top:14px;font-size:11.5px;color:var(--text-muted);font-family:'IBM Plex Mono',monospace;
+    border-left:2px solid var(--violet-dim);padding-left:10px;
+  }
+  footer{margin-top:26px;text-align:center;color:var(--text-muted);font-size:11.5px;font-family:'IBM Plex Mono',monospace;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <div class="mark">🛒</div>
+      <div>
+        <h1>CartPilot AI</h1>
+        <p>agentic commerce copilot</p>
+      </div>
+    </div>
+    <div class="track-pill">TRACK 1 — AI GROWTH &amp; AGENTIC COMMERCE</div>
+  </header>
+
+  <div class="control-row">
+    <div class="autonomy-card">
+      <div class="label-block">
+        <div class="k">Autonomy mode</div>
+        <div class="v" id="autonomyLabel">Ask before buying</div>
+      </div>
+      <div class="switch" id="autonomySwitch" role="button" tabindex="0" aria-label="Toggle autonomy mode"><div class="knob"></div></div>
+    </div>
+    <div class="stats-row">
+      <div class="stat-card"><div class="k">Missions run</div><div class="v" id="statMissions">0</div></div>
+      <div class="stat-card"><div class="k">Saved for you</div><div class="v mint" id="statSavings">$0.00</div></div>
+      <div class="stat-card"><div class="k">Time saved</div><div class="v amber" id="statTime">0 min</div></div>
+      <div class="stat-card"><div class="k">Agent actions</div><div class="v" id="statActions">0</div></div>
+    </div>
+  </div>
+
+  <div class="mission-card">
+    <div class="k">Give CartPilot a shopping goal</div>
+    <div class="input-row">
+      <input id="missionInput" type="text" placeholder="e.g. running shoes under $100 with great reviews" />
+      <button id="launchBtn">Launch agent</button>
+    </div>
+    <div class="chips">
+      <div class="chip" data-q="Running shoes under $100 with good reviews">running shoes under $100</div>
+      <div class="chip" data-q="Birthday gift for my mom who loves gardening, budget $50">gift for mom, budget $50</div>
+      <div class="chip" data-q="Noise cancelling headphones for travel under $180">travel headphones under $180</div>
+      <div class="chip" data-q="Home office upgrade, budget $220, need desk lamp and keyboard">home office upgrade, $220</div>
+    </div>
+  </div>
+
+  <div class="split">
+    <div class="console" id="console">
+      <div class="console-head"><span class="dot red"></span><span class="dot amber"></span><span class="dot green"></span>&nbsp; agent-console.log</div>
+      <div id="logBody"></div>
+    </div>
+
+    <div class="receipt-shell">
+      <div class="receipt">
+        <h2>CARTPILOT RECEIPT</h2>
+        <div class="sub" id="receiptSub">no active mission</div>
+        <hr class="divider" />
+        <div id="receiptBody"><div class="empty">Launch a mission — items will print here as the agent finds them.</div></div>
+        <div id="receiptFooter"></div>
+        <button class="checkout-btn" id="checkoutBtn" disabled>Checkout cart</button>
+        <button class="reset-btn" id="resetBtn" style="display:none;">Start new mission</button>
+      </div>
+      <div class="guardrail-note">⚠ Guardrail: even in Full Autonomy, CartPilot pauses for your approval on any order over <strong>$150</strong>.</div>
+    </div>
+  </div>
+
+  <footer>Runs 100% client-side · mock catalog · no backend, no API key needed</footer>
+</div>
+
+<script>
+(function(){
+  // ---------- Catalog ----------
+  const CATALOG = [
+    {id:1,name:"Pulse Runner 3.0",cat:"shoes",tags:["running","shoes","fitness","athletic"],price:89.99,rating:4.6,coupon:{code:"FIRST10",pct:10}},
+    {id:2,name:"TrailBlaze Mesh Sneaker",cat:"shoes",tags:["running","shoes","trail","fitness"],price:74.5,rating:4.3},
+    {id:3,name:"StrideCore Racer",cat:"shoes",tags:["running","shoes","race","fitness"],price:129.0,rating:4.8},
+    {id:4,name:"AeroSole Everyday",cat:"shoes",tags:["shoes","casual","walking"],price:54.0,rating:4.1},
+    {id:5,name:"QuietZone ANC Headphones",cat:"audio",tags:["headphones","travel","noise cancelling","audio"],price:159.0,rating:4.7,coupon:{code:"TRAVEL15",pct:15}},
+    {id:6,name:"SkyBud Pro Earbuds",cat:"audio",tags:["headphones","earbuds","travel","audio"],price:99.0,rating:4.2},
+    {id:7,name:"OrbitFlow Studio Cans",cat:"audio",tags:["headphones","studio","audio"],price:210.0,rating:4.5},
+    {id:8,name:"Bloom & Trowel Garden Set",cat:"gift",tags:["gardening","gift","mom","plants"],price:38.0,rating:4.7,coupon:{code:"GIFT5",pct:5}},
+    {id:9,name:"Ceramic Herb Planter Trio",cat:"gift",tags:["gardening","gift","mom","plants","decor"],price:45.0,rating:4.6},
+    {id:10,name:"Succulent Starter Kit",cat:"gift",tags:["gardening","gift","mom","plants"],price:29.5,rating:4.4},
+    {id:11,name:"Lumen Desk Lamp",cat:"office",tags:["desk lamp","office","lighting","home office"],price:42.0,rating:4.4},
+    {id:12,name:"KeyCraft Mechanical Keyboard",cat:"office",tags:["keyboard","office","home office","typing"],price:89.0,rating:4.6,coupon:{code:"DESK10",pct:10}},
+    {id:13,name:"ErgoRest Wrist Pad",cat:"office",tags:["office","home office","ergonomic"],price:16.0,rating:4.0},
+    {id:14,name:"FocusView 27\" Monitor",cat:"office",tags:["monitor","office","home office","display"],price:189.0,rating:4.5},
+    {id:15,name:"CalmMat Yoga Mat",cat:"fitness",tags:["yoga","fitness","mat"],price:32.0,rating:4.3},
+    {id:16,name:"BrewSteel Pour-Over Kit",cat:"gift",tags:["coffee","gift","kitchen"],price:34.0,rating:4.5},
+    {id:17,name:"NovaPack Travel Backpack",cat:"travel",tags:["backpack","travel","bag"],price:69.0,rating:4.4,coupon:{code:"TRAVEL15",pct:15}},
+    {id:18,name:"WristTrack Fitness Watch",cat:"fitness",tags:["watch","fitness","tracker"],price:119.0,rating:4.2},
+  ];
+
+  const STOPWORDS = new Set(["a","an","the","for","my","with","and","of","to","in","need","want","get","some","that","good","great","under","below","budget","less","than","who","loves","is","are"]);
+
+  // ---------- State ----------
+  let autonomyFull = false;
+  let running = false;
+  let cart = [];
+  let stats = {missions:0, savings:0, timeSec:0, actions:0};
+
+  // ---------- DOM ----------
+  const logBody = document.getElementById('logBody');
+  const consoleEl = document.getElementById('console');
+  const missionInput = document.getElementById('missionInput');
+  const launchBtn = document.getElementById('launchBtn');
+  const autonomySwitch = document.getElementById('autonomySwitch');
+  const autonomyLabel = document.getElementById('autonomyLabel');
+  const receiptBody = document.getElementById('receiptBody');
+  const receiptFooter = document.getElementById('receiptFooter');
+  const receiptSub = document.getElementById('receiptSub');
+  const checkoutBtn = document.getElementById('checkoutBtn');
+  const resetBtn = document.getElementById('resetBtn');
+
+  document.querySelectorAll('.chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      if(running) return;
+      missionInput.value = chip.dataset.q;
+      launchMission();
+    });
+  });
+
+  autonomySwitch.addEventListener('click', toggleAutonomy);
+  autonomySwitch.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' ') toggleAutonomy(); });
+  function toggleAutonomy(){
+    autonomyFull = !autonomyFull;
+    autonomySwitch.classList.toggle('on', autonomyFull);
+    autonomyLabel.textContent = autonomyFull ? "Full autonomy" : "Ask before buying";
+  }
+
+  launchBtn.addEventListener('click', launchMission);
+  missionInput.addEventListener('keydown', e=>{ if(e.key==='Enter') launchMission(); });
+  checkoutBtn.addEventListener('click', checkout);
+  resetBtn.addEventListener('click', resetMission);
+
+  // ---------- Helpers ----------
+  const sleep = ms => new Promise(r=>setTimeout(r, ms));
+  function nowStamp(){
+    const d = new Date();
+    return d.toTimeString().slice(0,8);
+  }
+  function appendLog(type, msg){
+    const line = document.createElement('div');
+    line.className = 'log-line ' + type;
+    line.innerHTML = `<span class="log-time">[${nowStamp()}]</span><span class="log-msg"></span>`;
+    line.querySelector('.log-msg').textContent = msg;
+    logBody.appendChild(line);
+    consoleEl.scrollTop = consoleEl.scrollHeight;
+    stats.actions++;
+    document.getElementById('statActions').textContent = stats.actions;
+    return line;
+  }
+  function waitForApproval(question){
+    return new Promise(resolve=>{
+      const box = document.createElement('div');
+      box.className = 'approval-box';
+      box.innerHTML = `<div class="q">⏸ ${question}</div><div class="btns"><button class="approve">Approve</button><button class="decline">Decline</button></div>`;
+      logBody.appendChild(box);
+      consoleEl.scrollTop = consoleEl.scrollHeight;
+      box.querySelector('.approve').addEventListener('click', ()=>{ box.remove(); resolve(true); });
+      box.querySelector('.decline').addEventListener('click', ()=>{ box.remove(); resolve(false); });
+    });
+  }
+
+  function parseIntent(text){
+    const lower = text.toLowerCase();
+    const budgetMatch = lower.match(/\$?\s?(\d{1,4})/);
+    const budget = budgetMatch ? parseInt(budgetMatch[1],10) : null;
+    const words = lower.replace(/[^a-z0-9$.\s]/g,' ').split(/\s+/).filter(w=>w && !STOPWORDS.has(w) && !/^\d+$/.test(w) && w!=='$');
+    return {budget, keywords: words, raw:text};
+  }
+
+  function scoreProduct(p, intent){
+    let score = p.rating * 10;
+    let matches = 0;
+    intent.keywords.forEach(kw=>{
+      if(p.name.toLowerCase().includes(kw)) matches += 2;
+      if(p.tags.some(t=>t.includes(kw))) matches += 3;
+      if(p.cat.includes(kw)) matches += 2;
+    });
+    score += matches * 4;
+    if(intent.budget){
+      if(p.price <= intent.budget) score += 12;
+      else score -= (p.price - intent.budget) * 0.5;
+    }
+    if(p.coupon) score += 3;
+    return {product:p, score, matches};
+  }
+
+  function fmt(n){ return '$' + n.toFixed(2); }
+
+  // ---------- Mission flow ----------
+  async function launchMission(){
+    if(running) return;
+    const text = missionInput.value.trim();
+    if(!text) return;
+    running = true;
+    launchBtn.disabled = true;
+    missionInput.disabled = true;
+    logBody.innerHTML = '';
+    receiptBody.innerHTML = '';
+    receiptFooter.innerHTML = '';
+    cart = [];
+    checkoutBtn.disabled = true;
+    checkoutBtn.style.display = 'block';
+    resetBtn.style.display = 'none';
+    receiptSub.textContent = 'mission in progress…';
+
+    const missionStart = Date.now();
+
+    appendLog('info', `mission received: "${text}"`);
+    await sleep(450);
+
+    const intent = parseIntent(text);
+    appendLog('action', 'parsing intent…');
+    await sleep(500);
+    appendLog('reason', `→ budget: ${intent.budget ? '$'+intent.budget : 'not specified'} · keywords: [${intent.keywords.join(', ')}]`);
+    await sleep(550);
+
+    appendLog('action', `searching catalog (${CATALOG.length} listings)…`);
+    await sleep(650);
+
+    const scored = CATALOG
+      .map(p=>scoreProduct(p,intent))
+      .filter(s=>s.matches>0 || !intent.budget)
+      .sort((a,b)=>b.score-a.score);
+
+    const candidates = scored.slice(0,4);
+    if(candidates.length===0){
+      appendLog('warn', 'no strong matches found — widening search…');
+      await sleep(500);
+    }
+    const picks = (candidates.length? candidates : scored.slice(0,4)).slice(0,3);
+
+    appendLog('info', `found ${picks.length} strong candidate(s)`);
+    await sleep(400);
+
+    for(const c of picks){
+      appendLog('reason', `comparing "${c.product.name}" — rating ${c.product.rating}★, ${fmt(c.product.price)}`);
+      await sleep(500);
+    }
+
+    const top = picks[0];
+    if(!top){
+      appendLog('error', 'could not find a suitable product for this mission.');
+      finishRun();
+      return;
+    }
+
+    appendLog('info', `selected best match: "${top.product.name}"`);
+    appendLog('reason', `why: closest fit on budget, rating and keyword relevance among ${picks.length} candidates`);
+    await sleep(600);
+
+    // negotiate / find deal
+    let finalPrice = top.product.price;
+    let discountNote = null;
+    if(top.product.coupon){
+      appendLog('action', `checking for active promotions on "${top.product.name}"…`);
+      await sleep(600);
+      const {code, pct} = top.product.coupon;
+      finalPrice = +(top.product.price * (1 - pct/100)).toFixed(2);
+      discountNote = {code, pct, before: top.product.price};
+      appendLog('deal', `found coupon ${code} — applied -${pct}% (saved ${fmt(top.product.price-finalPrice)})`);
+      stats.savings += (top.product.price - finalPrice);
+    } else {
+      appendLog('reason', 'no active coupon found for this item — price already competitive');
+    }
+    await sleep(500);
+
+    // ask-first gate before adding to cart
+    if(!autonomyFull){
+      const ok = await waitForApproval(`Add "${top.product.name}" to cart for ${fmt(finalPrice)}?`);
+      if(!ok){
+        appendLog('warn', 'user declined — mission ended without purchase.');
+        finishRun();
+        return;
+      }
+      appendLog('info', 'approved by user.');
+    } else {
+      appendLog('action', 'full autonomy — adding to cart automatically.');
+    }
+    await sleep(350);
+
+    addToReceipt(top.product, finalPrice, discountNote);
+    appendLog('deal', `added "${top.product.name}" to cart · ${fmt(finalPrice)}`);
+    await sleep(450);
+
+    // guardrail: orders over $150 always need approval regardless of mode
+    const cartTotal = cart.reduce((s,i)=>s+i.finalPrice,0);
+    if(cartTotal > 150){
+      appendLog('warn', `guardrail triggered — cart total ${fmt(cartTotal)} exceeds $150 autonomous limit.`);
+      const ok = await waitForApproval(`Cart is ${fmt(cartTotal)}, above your $150 auto-spend limit. Proceed to checkout?`);
+      if(!ok){
+        appendLog('warn', 'checkout paused — item stays in cart for your review.');
+        finishRun(false);
+        return;
+      }
+      appendLog('info', 'spending limit override approved.');
+    }
+
+    appendLog('info', 'mission complete — cart ready. review the receipt and checkout when ready.');
+    finishRun(true);
+
+    function finishRun(readyToCheckout){
+      running = false;
+      launchBtn.disabled = false;
+      missionInput.disabled = false;
+      checkoutBtn.disabled = !readyToCheckout;
+      const elapsed = (Date.now()-missionStart)/1000;
+      stats.timeSec += Math.max(90, 25*60 - elapsed); // vs. an assumed 25 min manual shopping baseline
+      stats.missions++;
+      document.getElementById('statMissions').textContent = stats.missions;
+      document.getElementById('statSavings').textContent = '$'+stats.savings.toFixed(2);
+      document.getElementById('statTime').textContent = Math.round(stats.timeSec/60) + ' min';
+      resetBtn.style.display = 'block';
+    }
+  }
+
+  function addToReceipt(product, finalPrice, discountNote){
+    if(receiptBody.querySelector('.empty')) receiptBody.innerHTML = '';
+    cart.push({product, finalPrice, discountNote});
+    receiptSub.textContent = `${cart.length} item(s) · printed live`;
+
+    const row = document.createElement('div');
+    row.className = 'r-item';
+    row.innerHTML = `
+      <div class="nm">${product.name}<span class="tag">${product.cat} · ${product.rating}★</span></div>
+      <div>${discountNote ? `<span class="strike">${fmt(discountNote.before)}</span>` : ''}${fmt(finalPrice)}</div>
+    `;
+    receiptBody.appendChild(row);
+
+    renderTotals();
+  }
+
+  function renderTotals(){
+    const subtotal = cart.reduce((s,i)=>s+(i.discountNote?i.discountNote.before:i.finalPrice),0);
+    const total = cart.reduce((s,i)=>s+i.finalPrice,0);
+    const saved = subtotal-total;
+    receiptFooter.innerHTML = `
+      <hr class="divider"/>
+      <div class="r-totals">
+        <div class="row"><span>Subtotal</span><span>${fmt(subtotal)}</span></div>
+        ${saved>0.001 ? `<div class="row save"><span>Agent savings</span><span>-${fmt(saved)}</span></div>` : ''}
+        <div class="row total"><span>Total</span><span>${fmt(total)}</span></div>
+      </div>
+    `;
+  }
+
+  function checkout(){
+    if(cart.length===0) return;
+    const orderId = 'CP-' + Math.random().toString(36).slice(2,8).toUpperCase();
+    const stamp = document.createElement('div');
+    stamp.className = 'stamp mint';
+    stamp.textContent = 'Order Placed';
+    receiptFooter.appendChild(stamp);
+    const idLine = document.createElement('div');
+    idLine.className = 'order-id';
+    idLine.textContent = `Order ${orderId} · est. delivery 3–5 business days`;
+    receiptFooter.appendChild(idLine);
+    checkoutBtn.disabled = true;
+    appendLog('deal', `checkout complete — order ${orderId} placed.`);
+  }
+
+  function resetMission(){
+    missionInput.value = '';
+    logBody.innerHTML = '';
+    receiptBody.innerHTML = '<div class="empty">Launch a mission — items will print here as the agent finds them.</div>';
+    receiptFooter.innerHTML = '';
+    receiptSub.textContent = 'no active mission';
+    checkoutBtn.disabled = true;
+    checkoutBtn.style.display = 'block';
+    resetBtn.style.display = 'none';
+    cart = [];
+    missionInput.focus();
+  }
+})();
+</script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CartPilot AI — Agentic Commerce Copilot</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://googleapis.com" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #0B0F1A;
+            --panel: #131A2E;
+            --panel-2: #1B2340;
+            --paper: #F4F0E4;
+            --paper-line: #D8D2BF;
+            --violet: #7C6FFF;
+            --violet-dim: #4B4394;
+            --mint: #2FE6A6;
+            --amber: #FFB020;
+            --red: #FF6B6B;
+            --text: #E7E9F5;
+            --text-muted: #8A93B2;
+            --ink-on-paper: #20201B;
+        }
+        * { box-sizing: border-box; }
+        html, body { margin: 0; padding: 0; }
+        body {
+            background: radial-gradient(1200px 600px at 15% -10%, rgba(124,111,255,0.16), transparent 60%),
+                        radial-gradient(900px 500px at 100% 0%, rgba(47,230,166,0.08), transparent 55%),
+                        var(--ink);
+            color: var(--text);
+            font-family: 'IBM Plex Sans', sans-serif;
+            min-height: 100vh;
+            padding: 28px 20px 60px;
+        }
+        .wrap { max-width: 1180px; margin: 0 auto; }
+        header { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
+        .brand { display: flex; align-items: center; gap: 12px; }
+        .brand .mark {
+            width: 40px; height: 40px; border-radius: 10px;
+            background: linear-gradient(135deg, var(--violet), #4B4394);
+            display: flex; align-items: center; justify-content: center; font-size: 19px;
+            box-shadow: 0 0 0 1px rgba(124,111,255,0.4), 0 8px 20px -6px rgba(124,111,255,0.6);
+        }
+        .brand h1 { font-family: 'Space Grotesk', sans-serif; font-size: 20px; margin: 0; letter-spacing: 0.3px; }
+        .brand p { margin: 0; font-size: 12px; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; }
+        .track-pill {
+            font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--mint);
+            border: 1px solid rgba(47,230,166,0.35); background: rgba(47,230,166,0.08);
+            padding: 6px 12px; border-radius: 100px; white-space: nowrap;
+        }
+        .control-row { display: flex; gap: 14px; flex-wrap: wrap; align-items: stretch; margin-bottom: 18px; }
+        .autonomy-card, .stat-card { background: var(--panel); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 14px 16px; }
+        .autonomy-card { display: flex; align-items: center; gap: 14px; flex: 1 1 320px; }
+        .autonomy-card .label-block { flex: 1; }
+        .autonomy-card .label-block .k { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; }
+        .autonomy-card .label-block .v { font-family: 'Space Grotesk', sans-serif; font-size: 15px; margin-top: 2px; }
+        .switch { position: relative; width: 64px; height: 32px; border-radius: 100px; background: var(--panel-2); border: 1px solid rgba(255,255,255,0.1); cursor: pointer; flex-shrink: 0; transition: background 0.22s; }
+        .switch .knob { position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: var(--violet); transition: left 0.22s cubic-bezier(0.4, 0, 0.2, 1), background 0.22s; box-shadow: 0 2px 6px rgba(0,0,0,0.4); }
+        .switch.on { background: rgba(47,230,166,0.15); border-color: rgba(47,230,166,0.3); }
+        .switch.on .knob { left: 35px; background: var(--mint); }
+        .stats-row { display: flex; gap: 14px; flex-wrap: wrap; flex: 2 1 420px; }
+        .stat-card { flex: 1 1 120px; text-align: left; }
+        .stat-card .k { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; }
+        .stat-card .v { font-family: 'Space Grotesk', sans-serif; font-size: 22px; margin-top: 4px; }
+        .stat-card .v.mint { color: var(--mint); }
+        .stat-card .v.amber { color: var(--amber); }
+        .mission-card { background: var(--panel); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 16px 18px; margin-bottom: 20px; }
+        .mission-card .k { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; margin-bottom: 10px; }
+        .input-row { display: flex; gap: 10px; }
+        .input-row input { flex: 1; background: var(--panel-2); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 13px 14px; color: var(--text); font-size: 14.5px; font-family: 'IBM Plex Sans', sans-serif; }
+        .input-row input:focus { outline: 2px solid var(--violet); outline-offset: 1px; }
+        .input-row button { background: var(--violet); color: white; border: none; border-radius: 10px; padding: 0 24px; font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 14px; cursor: pointer; transition: filter 0.15s, background 0.15s; }
+        .input-row button:hover { filter: brightness(1.12); }
+        .input-row button:disabled { opacity: 0.45; cursor: not-allowed; }
+        .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+        .chip { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: var(--text-muted); background: var(--panel-2); border: 1px solid rgba(255,255,255,0.08); padding: 6px 11px; border-radius: 100px; cursor: pointer; transition: all 0.15s; }
+        .chip:hover { color: var(--text); border-color: var(--violet); background: rgba(124,111,255,0.1); }
+        .split { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 18px; align-items: start; }
+        @media (max-width: 880px) { .split { grid-template-columns: 1fr; } }
+        .console { background: #0D1122; border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; padding: 16px; height: 420px; overflow-y: auto; font-family: 'IBM Plex Mono', monospace; font-size: 12.8px; line-height: 1.7; scroll-behavior: smooth; }
+        .console-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; }
+        .console-title { display: flex; align-items: center; gap: 8px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+        .dot.red { background: #FF6B6B; }
+        .dot.amber { background: var(--amber); }
+        .dot.green { background: var(--mint); }
+        .log-line { display: flex; gap: 12px; padding: 3px 0; opacity: 0; transform: translateY(4px); animation: fadeInLog 0.2s forwards ease-out; }
+        @keyframes fadeInLog { to { opacity: 1; transform: translateY(0); } }
+        .log-time { color: #4C5680; flex-shrink: 0; min-width: 65px; }
+        .log-msg { white-space: pre-wrap; word-break: break-word; flex: 1; }
+        .log-line.info .log-msg { color: var(--text); }
+        .log-line.action .log-msg { color: #9CB4FF; font-weight: 500; }
+        .log-line.reason .log-msg { color: var(--text-muted); font-style: italic; }
+        .log-line.deal .log-msg { color: var(--mint); font-weight: 600; }
+        .log-line.warn .log-msg { color: var(--amber); }
+        .log-line.error .log-msg { color: var(--red); }
+        .approval-box { margin: 10px 0; padding: 12px; border: 1px dashed var(--amber); border-radius: 10px; background: rgba(255, 176, 32, 0.04); animation: fadeInLog 0.2s forwards; }
+        .approval-box .q { color: var(--amber); margin-bottom: 10px; font-size: 12.5px; font-weight: 500; }
+        .approval-box .btns { display: flex; gap: 8px; }
+        .approval-box button { font-family: 'IBM Plex Mono', monospace; font-size: 11px; border-radius: 6px; padding: 6px 14px; cursor: pointer; border: 1px solid transparent; transition: all 0.15s; }
+        .approval-box button.approve { background: var(--mint); color: #0B0F1A; font-weight: 600; }
+        .approval-box button.reject { background: transparent; border-color: rgba(255,255,255,0.15); color: var(--text-muted); }
+        .approval-box button:hover { transform: translateY(-1px); filter: brightness(1.1); }
+        
+        .preview-pane { background: var(--panel); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 18px; height: 420px; display: flex; flex-direction: column; }
+        .preview-pane h3 { font-family: 'Space Grotesk', sans-serif; font-size: 14px; text-transform: uppercase; margin: 0 0 14px 0; color: var(--text-muted); letter-spacing: 0.05em; }
+        .cart-manifest { flex: 1; border: 1px dashed rgba(255,255,255,0.08); border-radius: 10px; background: rgba(0,0,0,0.15); display: flex; flex-direction: column; justify-content: center; align-items: center; color: var(--text-muted); font-size: 13px; text-align: center; padding: 20px; }
+        .cart-manifest.active { justify-content: flex-start; align-items: stretch; text-align: left; padding: 12px; overflow-y: auto; }
+        .cart-item { display: flex; justify-content: space-between; background: var(--panel-2); padding: 10px; border-radius: 8px; margin-bottom: 8px; border-left: 3px solid var(--violet); }
+        .cart-item-info .title { font-weight: 500; font-size: 13px; color: var(--text); }
+        .cart-item-info .merchant { font-size: 11px; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; margin-top: 2px; }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CartPilot AI — Agentic Commerce Copilot</title>
+    <link rel="preconnect" href="https://googleapis.com">
+    <link href="https://googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #0B0F1A;
+            --panel: #131A2E;
+            --panel-2: #1B2340;
+            --paper: #F4F0E4;
+            --paper-line: #D8D2BF;
+            --violet: #7C6FFF;
+            --violet-dim: #4B4394;
+            --mint: #2FE6A6;
+            --amber: #FFB020;
+            --red: #FF6B6B;
+            --text: #E7E9F5;
+            --text-muted: #8A93B2;
+            --ink-on-paper: #20201B;
+        }
+        * { box-sizing: border-box; }
+        html, body { margin: 0; padding: 0; }
+        body {
+            background: radial-gradient(1200px 600px at 15% -10%, rgba(124,111,255,0.16), transparent 60%),
+                        radial-gradient(900px 500px at 100% 0%, rgba(47,230,166,0.08), transparent 55%),
+                        var(--ink);
+            color: var(--text);
+            font-family: 'IBM Plex Sans', sans-serif;
+            min-height: 100vh;
+            padding: 28px 20px 60px;
+        }
+        .wrap { max-width: 1180px; margin: 0 auto; }
+        header { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
+        .brand { display: flex; align-items: center; gap: 12px; }
+        .brand .mark {
+            width: 40px; height: 40px; border-radius: 10px;
+            background: linear-gradient(135deg, var(--violet), #4B4394);
+            display: flex; align-items: center; justify-content: center; font-size: 19px;
+            box-shadow: 0 0 0 1px rgba(124,111,255,0.4), 0 8px 20px -6px rgba(124,111,255,0.6);
+        }
+        .brand h1 { font-family: 'Space Grotesk', sans-serif; font-size: 20px; margin: 0; letter-spacing: 0.3px; }
+        .brand p { margin: 0; font-size: 12px; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; }
+        .track-pill {
+            font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--mint);
+            border: 1px solid rgba(47,230,166,0.35); background: rgba(47,230,166,0.08);
+            padding: 6px 12px; border-radius: 100px; white-space: nowrap;
+        }
+        .control-row { display: flex; gap: 14px; flex-wrap: wrap; align-items: stretch; margin-bottom: 18px; }
+        .autonomy-card, .stat-card { background: var(--panel); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 14px 16px; }
+        .autonomy-card { display: flex; align-items: center; gap: 14px; flex: 1 1 320px; }
+        .autonomy-card .label-block { flex: 1; }
+        .autonomy-card .label-block .k { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; }
+        .autonomy-card .label-block .v { font-family: 'Space Grotesk', sans-serif; font-size: 15px; margin-top: 2px; }
+        .switch { position: relative; width: 64px; height: 32px; border-radius: 100px; background: var(--panel-2); border: 1px solid rgba(255,255,255,0.1); cursor: pointer; flex-shrink: 0; transition: background 0.22s; }
+        .switch .knob { position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: var(--violet); transition: left 0.22s cubic-bezier(0.4, 0, 0.2, 1), background 0.22s; box-shadow: 0 2px 6px rgba(0,0,0,0.4); }
+        .switch.on { background: rgba(47,230,166,0.15); border-color: rgba(47,230,166,0.3); }
+        .switch.on .knob { left: 35px; background: var(--mint); }
+        .stats-row { display: flex; gap: 14px; flex-wrap: wrap; flex: 2 1 420px; }
+        .stat-card { flex: 1 1 120px; text-align: left; }
+        .stat-card .k { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; }
+        .stat-card .v { font-family: 'Space Grotesk', sans-serif; font-size: 22px; margin-top: 4px; }
+        .stat-card .v.mint { color: var(--mint); }
+        .stat-card .v.amber { color: var(--amber); }
+        .mission-card { background: var(--panel); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 16px 18px; margin-bottom: 20px; }
+        .mission-card .k { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; margin-bottom: 10px; }
+        .input-row { display: flex; gap: 10px; }
+        .input-row input { flex: 1; background: var(--panel-2); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 13px 14px; color: var(--text); font-size: 14.5px; font-family: 'IBM Plex Sans', sans-serif; }
+        .input-row input:focus { outline: 2px solid var(--violet); outline-offset: 1px; }
+        .input-row button { background: var(--violet); color: white; border: none; border-radius: 10px; padding: 0 24px; font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 14px; cursor: pointer; transition: filter 0.15s, background 0.15s; }
+        .input-row button:hover { filter: brightness(1.12); }
+        .input-row button:disabled { opacity: 0.45; cursor: not-allowed; }
+        .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+        .chip { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: var(--text-muted); background: var(--panel-2); border: 1px solid rgba(255,255,255,0.08); padding: 6px 11px; border-radius: 100px; cursor: pointer; transition: all 0.15s; }
+        .chip:hover { color: var(--text); border-color: var(--violet); background: rgba(124,111,255,0.1); }
+        .split { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 18px; align-items: start; }
+        @media (max-width: 880px) { .split { grid-template-columns: 1fr; } }
+        .console { background: #0D1122; border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; padding: 16px; height: 420px; overflow-y: auto; font-family: 'IBM Plex Mono', monospace; font-size: 12.8px; line-height: 1.7; scroll-behavior: smooth; }
+        .console-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; }
+        .console-title { display: flex; align-items: center; gap: 8px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+        .dot.red { background: #FF6B6B; }
+        .dot.amber { background: var(--amber); }
+        .dot.green { background: var(--mint); }
+        .log-line { display: flex; gap: 12px; padding: 3px 0; opacity: 0; transform: translateY(4px); animation: fadeInLog 0.2s forwards ease-out; }
+        @keyframes fadeInLog { to { opacity: 1; transform: translateY(0); } }
+        .log-time { color: #4C5680; flex-shrink: 0; min-width: 65px; }
+        .log-msg { white-space: pre-wrap; word-break: break-word; flex: 1; }
+        .log-line.info .log-msg { color: var(--text); }
+        .log-line.action .log-msg { color: #9CB4FF; font-weight: 500; }
+        .log-line.reason .log-msg { color: var(--text-muted); font-style: italic; }
+        .log-line.deal .log-msg { color: var(--mint); font-weight: 600; }
+        .log-line.warn .log-msg { color: var(--amber); }
+        .log-line.error .log-msg { color: var(--red); }
+        .approval-box { margin: 10px 0; padding: 12px; border: 1px dashed var(--amber); border-radius: 10px; background: rgba(255, 176, 32, 0.04); animation: fadeInLog 0.2s forwards; }
+        .approval-box .q { color: var(--amber); margin-bottom: 10px; font-size: 12.5px; font-weight: 500; }
+        .approval-box .btns { display: flex; gap: 8px; }
+        .approval-box button { font-family: 'IBM Plex Mono', monospace; font-size: 11px; border-radius: 6px; padding: 6px 14px; cursor: pointer; border: 1px solid transparent; transition: all 0.15s; }
+        .approval-box button.approve { background: var(--mint); color: #0B0F1A; font-weight: 600; }
+        .approval-box button.reject { background: transparent; border-color: rgba(255,255,255,0.15); color: var(--text-muted); }
+        .approval-box button:hover { transform: translateY(-1px); filter: brightness(1.1); }
+        
+        .preview-pane { background: var(--panel); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 18px; height: 420px; display: flex; flex-direction: column; }
+        .preview-pane h3 { font-family: 'Space Grotesk', sans-serif; font-size: 14px; text-transform: uppercase; margin: 0 0 14px 0; color: var(--text-muted); letter-spacing: 0.05em; }
+        .cart-manifest { flex: 1; border: 1px dashed rgba(255,255,255,0.08); border-radius: 10px; background: rgba(0,0,0,0.15); display: flex; flex-direction: column; justify-content: center; align-items: center; color: var(--text-muted); font-size: 13px; text-align: center; padding: 20px; }
+        .cart-manifest.active { justify-content: flex-start; align-items: stretch; text-align: left; padding: 12px; overflow-y: auto; }
+        .cart-item { display: flex; justify-content: space-between; background: var(--panel-2); padding: 10px; border-radius: 8px; margin-bottom: 8px; border-left: 3px solid var(--violet); }
+        .cart-item-info .title { font-weight: 500; font-size: 13px; color: var(--text); }
+        .cart-item-info .merchant { font-size: 11px; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; margin-top: 2px; }
+        .cart-item-price { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 14px; color: var(--mint); text-align: right; }
